@@ -1,13 +1,16 @@
 package com.example.myfingerprintauthenticationapplication;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.CancellationSignal;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
@@ -19,14 +22,13 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         this.context = context;
 
     }
-    //where the magic happens/starts to authenticate.
+
     public void startAuth(FingerprintManager fingerprintManager, FingerprintManager.CryptoObject cryptoObject){
 
         CancellationSignal cancellationSignal = new CancellationSignal();
         fingerprintManager.authenticate(cryptoObject, cancellationSignal, 0, this, null);
 
     }
-    //methods used to update UI
 
     @Override
     public void onAuthenticationError(int errorCode, CharSequence errString) {
@@ -65,15 +67,14 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
         if(b == false){
 
-            //paraLabel.setTextColor(ContextCompat.getColor(context, R.color.red));
+            //paraLabel.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
 
         } else {
 
-           //paraLabel.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            //imageView.setImageResource(R.mipmap.action_done);
+            paraLabel.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            imageView.setImageResource(R.mipmap.action_done);
 
         }
 
     }
 }
-

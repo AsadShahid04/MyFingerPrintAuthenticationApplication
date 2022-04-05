@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mParaLabel;
     private Cipher cipher;
     private KeyguardManager keyguardManager; //will be used to check whether security is enabled on lockscreen or not.
-
+    private KeyStore keyStore;
+    private String KEY_NAME = "AndroidKey";
 
     private FingerprintManager fingerprintManager;
 
@@ -87,9 +88,64 @@ public class MainActivity extends AppCompatActivity {
                 mParaLabel.setText("Place your Finger on Scanner to Access the App.");
                 FingerprintHandler fingerprintHandler = new FingerprintHandler(this);
                 fingerprintHandler.startAuth(fingerprintManager, null);
-
             }
-
         }
     }
+
+    //methods for CryptoObject
+    @TargetApi(Build.VERSION_CODES.M)
+    private void generateKey() {
+        try {
+
+            keyStore = KeyStore.getInstance("AndroidKeyStore");
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+
+            keyStore.load(null);
+            keyGenerator.init(new
+                    KeyGenParameterSpec.Builder(KEY_NAME,
+                    KeyProperties.PURPOSE_ENCRYPT |
+                            KeyProperties.PURPOSE_DECRYPT)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                    .setUserAuthenticationRequired(true)
+                    .setEncryptionPaddings(
+                            KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                    .build());
+            keyGenerator.generateKey();
+
+        } catch (KeyStoreException | IOException | CertificateException
+                | NoSuchAlgorithmException | InvalidAlgorithmParameterException
+                | NoSuchProviderException e) {
+
+            e.printStackTrace();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public boolean cipherInit() {
+        try {
+            cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new RuntimeException("Failed to get Cipher", e);
+        }
+
+
+        try {
+
+            keyStore.load(null);
+
+            SecretKey key = (SecretKey) keyStore.getKey(KEY_NAME,
+                    null);
+
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            return true;
+
+        } catch (KeyPermanentlyInvalidatedException e) {
+            return false;
+        } catch (KeyStoreException | CertificateException | UnrecoverableKeyException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException("Failed to init Cipher", e);
+        }
+
+    }
+
 }

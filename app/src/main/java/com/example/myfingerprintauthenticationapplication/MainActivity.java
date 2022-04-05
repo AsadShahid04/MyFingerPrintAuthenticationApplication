@@ -57,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
         mParaLabel = (TextView) findViewById(R.id.paraLabel);
 
         //Below are the requirements Android Phone needs to run this app:
-        // TODO Check 1: Android version should be greater or equal to Marshmallow
-        // TODO Check 2: Device has Fingerprint Scanner
-        // TODO Check 3: Have permission to use fingerprint scanner in the app
-        // TODO Check 4: Lock screen is secured with at least 1 type of lock
-        // TODO Check 5: At least 1 Fingerprint is registered within phone settings
+        // Check 1: Android version should be greater or equal to Marshmallow
+        // Check 2: Device has Fingerprint Scanner
+        // Check 3: Have permission to use fingerprint scanner in the app
+        // Check 4: Lock screen is secured with at least 1 type of lock
+        // Check 5: At least 1 Fingerprint is registered within phone settings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             fingerprintManager = (FingerprintManager) getSystemService(FINGERPRINT_SERVICE);
@@ -86,8 +86,13 @@ public class MainActivity extends AppCompatActivity {
             } else { //phone is ready to go
 
                 mParaLabel.setText("Place your Finger on Scanner to Access the App.");
-                FingerprintHandler fingerprintHandler = new FingerprintHandler(this);
-                fingerprintHandler.startAuth(fingerprintManager, null);
+                generateKey();
+                if(cipherInit()){
+                    FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(cipher);
+                    FingerprintHandler fingerprintHandler = new FingerprintHandler(this);
+                    fingerprintHandler.startAuth(fingerprintManager, cryptoObject);
+                }
+
             }
         }
     }
@@ -127,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException("Failed to get Cipher", e);
         }
-
-
         try {
 
             keyStore.load(null);

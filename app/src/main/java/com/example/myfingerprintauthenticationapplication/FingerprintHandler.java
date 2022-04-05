@@ -6,7 +6,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.media.Image;
 import android.os.Build;
 import android.os.CancellationSignal;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -71,7 +71,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
         } else {
 
-            paraLabel.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            //paraLabel.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             imageView.setImageResource(R.mipmap.action_done);
 
         }
